@@ -72,8 +72,8 @@ class TestIscsi(unittest.TestCase):
         self.assertEqual(dict, type(returned_obj['global']))
         self.assertEqual(dict, type(returned_obj['target']))
         
-    def test_test_iqn(self):
-        # parse_ietd_config.test_iqn()
+    def test_test_valid_iqn(self):
+        # parse_ietd_config.test_valid_iqn()
         # target keys must be checked to be an "iSCSI Qualified Name"
         
         fake_name = 'iqn.com.example:storage.disk2.sys1.xyz'
@@ -81,10 +81,10 @@ class TestIscsi(unittest.TestCase):
         good_name2 = 'iqn.2001-04.com.example'
         good_name3 = 'iqn.9846-34.com.example.test.sertver5'
         
-        self.assertTrue(not Iscsi().test_iqn(fake_name))
-        self.assertTrue(Iscsi().test_iqn(good_name1))
-        self.assertTrue(Iscsi().test_iqn(good_name2))
-        self.assertTrue(Iscsi().test_iqn(good_name3))
+        self.assertTrue(not Iscsi().test_valid_iqn(fake_name))
+        self.assertTrue(Iscsi().test_valid_iqn(good_name1))
+        self.assertTrue(Iscsi().test_valid_iqn(good_name2))
+        self.assertTrue(Iscsi().test_valid_iqn(good_name3))
         
     
 suite = unittest.TestLoader().loadTestsFromTestCase(TestIscsi)

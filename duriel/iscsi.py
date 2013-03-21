@@ -69,7 +69,7 @@ class Iscsi():
             
         return ietd_conf
         
-    def test_iqn(self, iqn):
+    def test_valid_iqn(self, iqn):
         valid_iqn = re.compile('''iqn\.\d{4}-\d{2}(\.\w{1,64}){1,16}(:(\.?\w{1,64}){1,16})?''')
         if re.match(valid_iqn, iqn):
             return True
@@ -78,4 +78,4 @@ class Iscsi():
         
     
 #~ a=Iscsi()
-#~ print a.test_iqn('iqn.2001-04.com.example:storage.disk2.sys1.xyz')
+#~ print a.test_valid_iqn('iqn.2001-04.com.example:storage.disk2.sys1.xyz')
