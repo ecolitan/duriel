@@ -80,9 +80,20 @@ class TestIscsi(unittest.TestCase):
             'global': {'IncomingUser': 'joe secret'},
             'target': {'iqn.2001-04.com.example': {}},
             }
+            
         valid1_file = '{0}/ietd.conf.valid1'.format(test_data_path)
-        
+        valid2_file = '{0}/ietd.conf.valid2'.format(test_data_path)
+        valid3_file = '{0}/ietd.conf.valid3'.format(test_data_path)
+        invalid1_file = '{0}/ietd.conf.invalid1'.format(test_data_path)
+        invalid2_file = '{0}/ietd.conf.invalid2'.format(test_data_path)
+        invalid3_file = '{0}/ietd.conf.invalid3'.format(test_data_path)
+                                        
         self.assertEqual(valid1, Iscsi().parse_ietd_config(valid1_file))
+        
+        # raise IscsiError for invalid config file syntax
+        #self.assertRaises(IscsiError, Iscsi().parse_ietd_config, invalid1_file)
+        #self.assertRaises(IscsiError, Iscsi().parse_ietd_config, invalid2_file)
+        #self.assertRaises(IscsiError, Iscsi().parse_ietd_config, invalid3_file)
         
     def test_test_valid_iqn(self):
         # parse_ietd_config.test_valid_iqn()
