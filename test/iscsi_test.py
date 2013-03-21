@@ -16,8 +16,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
+import os
 import unittest
 from duriel.iscsi import Iscsi
+
+test_data_path = '{0}/test/test_data'.format(os.getcwd())
 
 class TestIscsi(unittest.TestCase):
     
@@ -71,6 +74,15 @@ class TestIscsi(unittest.TestCase):
         # global and target keys must be type dict
         self.assertEqual(dict, type(returned_obj['global']))
         self.assertEqual(dict, type(returned_obj['target']))
+        
+        # parse test_data/ietd.conf.validx files correctly
+        valid1 = {
+            'global': {'IncomingUser': 'joe secret'},
+            'target': {'iqn.2001-04.com.example': {}},
+            }
+        valid1_file = '{0}/ietd.conf.valid1'.format(test_data_path)
+        
+        self.assertEqual(valid1, Iscsi().parse_ietd_config(valid1_file))
         
     def test_test_valid_iqn(self):
         # parse_ietd_config.test_valid_iqn()

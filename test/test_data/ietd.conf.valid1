@@ -1,0 +1,18 @@
+#iSNSServer 192.168.1.16
+#iSNSAccessControl No
+
+IncomingUser joe secret
+#OutgoingUser jack 12charsecret
+
+Target iqn.2001-04.com.example:storage.disk2.sys1.xyz
+    # CHAP Users
+    #
+    # The same rules as for discovery users apply here.
+    
+    # Don't set them if you don't want to use CHAP authentication.
+    #
+    IncomingUser joe secret
+    OutgoingUser jim 12charpasswd
+    
+Target iqn.2001-04.com.example
+    
