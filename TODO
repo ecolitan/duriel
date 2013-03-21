@@ -1,0 +1,9 @@
+#TODOs for project
+
+# LV Labels are max length of 127 chars
+
+# functionality to detect failed transfers and resume them
+
+# http://www.howtoforge.com/using-iscsi-on-debian-squeeze-initiator-and-target
+
+# Document server/client model for LVM Snapshots and for iSCSI Transfers 

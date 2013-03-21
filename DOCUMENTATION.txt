@@ -1,0 +1,47 @@
+#############
+# Requirements
+
+# Python Packages
+
+# Debian Packages
+
+
+
+###############
+# Documentation
+
+1. It is very important that LVM Snapshots do not fill up, thereby rendering themselves invalid.
+
+To ensure this doesn't happen, enable snapshot autoextending in LVM2
+
+/etc/lvm/lvm.conf
+    snapshot_autoextend_threshold = 80
+    snapshot_autoextend_percent = 20
+
+The lvm2-monitor service needs to be restarted.
+
+
+##########
+# Workflow
+
+Create Initial Backup (snapshot) for single LV
+==============================================
+
+1. Check server_vg has sufficient space for 100% snapshot of client_lv
+2. Check client_vg has sufficient space for 100% snapshot of client_lv
+3. Create 100% snapshot of client_lv (client_lv_snap) on client_vg
+4. Create backup_client_lv on server_vg to hold 100% snapshot of client_lv
+5. Copy client_lv_snap into backup_client_lv
+6. Release client_lv_snap
+
+
+Update Snapshot for single LV
+=============================
+
+1. Check server_vg has sufficient space for 100% snapshot of client_lv
+2. Check client_vg has sufficient space for 100% snapshot of client_lv
+3. Create 100% snapshot of client_lv (client_lv_snap) on client_vg
+4. Create 10% snapshot (with autoextend) of server_lv (server_lv_snap_date) on server_vg
+5. Mount client_lv_snap on client_server under /mnt/client_lv_snap_tempid
+6. Mount server_lv on server_server under /mnt/server_lv_tempid
+7. Rsync client:/mnt/client_lv_snap_tempid server:/mnt/server_lv_tempid
