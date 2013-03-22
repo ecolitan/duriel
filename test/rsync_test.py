@@ -16,7 +16,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-__author__ = "Aaron Cossey"
-__version__ = "0.0.1"
+import os
+import unittest
+from duriel.rsync import Rsync
 
-__all__ = ['iscsi', 'rsync', 'remoteexec']
+test_data_path = '{0}/test/test_data'.format(os.getcwd())
