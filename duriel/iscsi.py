@@ -59,23 +59,43 @@ class Iscsi():
         '''
         #TODO ietd_config_path should be in config as a variable
         
-        
+        testlist=[]
         ietd_conf = {}
         ietd_conf['global'] = {}
         ietd_conf['target'] = {}
+        inTarget = 0
         with open(ietd_config_path) as f:
-            pass
+            for line in f:
+                li = line.strip()
+                if (li.lstrip().startswith('#') or not li):
+                    continue
+                
+                if li.split(' ')[0] == 'Target':
+                    if not self.test_valid_iqn(li.split()[1]):
+                        raise IscsiError('Invalid Target iqn in config')
+                    inTarget = inTarget+1
+                    
+                    #test that iqn doesnt already exist as a key
+                    
+                    continue
+                
+                    
+        print inTarget
             
             
         return ietd_conf
         
-    def test_iqn(self, iqn):
+    def test_valid_iqn(self, iqn):
         valid_iqn = re.compile('''iqn\.\d{4}-\d{2}(\.\w{1,64}){1,16}(:(\.?\w{1,64}){1,16})?''')
         if re.match(valid_iqn, iqn):
             return True
         else:
             return False
         
+class IscsiError(Exception):
+    def __init__(self, msg):
+        print self.msg
+    
     
 #~ a=Iscsi()
-#~ print a.test_iqn('iqn.2001-04.com.example:storage.disk2.sys1.xyz')
+#~ print a.test_valid_iqn('iqn.2001-04.com.example:storage.disk2.sys1.xyz')

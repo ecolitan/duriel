@@ -16,8 +16,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
+import os
 import unittest
 from duriel.iscsi import Iscsi
+
+test_data_path = '{0}/test/test_data'.format(os.getcwd())
 
 class TestIscsi(unittest.TestCase):
     
@@ -72,8 +75,28 @@ class TestIscsi(unittest.TestCase):
         self.assertEqual(dict, type(returned_obj['global']))
         self.assertEqual(dict, type(returned_obj['target']))
         
-    def test_test_iqn(self):
-        # parse_ietd_config.test_iqn()
+        # parse test_data/ietd.conf.validx files correctly
+        valid1 = {
+            'global': {'IncomingUser': 'joe secret'},
+            'target': {'iqn.2001-04.com.example': {}},
+            }
+            
+        valid1_file = '{0}/ietd.conf.valid1'.format(test_data_path)
+        valid2_file = '{0}/ietd.conf.valid2'.format(test_data_path)
+        valid3_file = '{0}/ietd.conf.valid3'.format(test_data_path)
+        invalid1_file = '{0}/ietd.conf.invalid1'.format(test_data_path)
+        invalid2_file = '{0}/ietd.conf.invalid2'.format(test_data_path)
+        invalid3_file = '{0}/ietd.conf.invalid3'.format(test_data_path)
+                                        
+        self.assertEqual(valid1, Iscsi().parse_ietd_config(valid1_file))
+        
+        # raise IscsiError for invalid config file syntax
+        #self.assertRaises(IscsiError, Iscsi().parse_ietd_config, invalid1_file)
+        #self.assertRaises(IscsiError, Iscsi().parse_ietd_config, invalid2_file)
+        #self.assertRaises(IscsiError, Iscsi().parse_ietd_config, invalid3_file)
+        
+    def test_test_valid_iqn(self):
+        # parse_ietd_config.test_valid_iqn()
         # target keys must be checked to be an "iSCSI Qualified Name"
         
         fake_name = 'iqn.com.example:storage.disk2.sys1.xyz'
@@ -81,10 +104,10 @@ class TestIscsi(unittest.TestCase):
         good_name2 = 'iqn.2001-04.com.example'
         good_name3 = 'iqn.9846-34.com.example.test.sertver5'
         
-        self.assertTrue(not Iscsi().test_iqn(fake_name))
-        self.assertTrue(Iscsi().test_iqn(good_name1))
-        self.assertTrue(Iscsi().test_iqn(good_name2))
-        self.assertTrue(Iscsi().test_iqn(good_name3))
+        self.assertTrue(not Iscsi().test_valid_iqn(fake_name))
+        self.assertTrue(Iscsi().test_valid_iqn(good_name1))
+        self.assertTrue(Iscsi().test_valid_iqn(good_name2))
+        self.assertTrue(Iscsi().test_valid_iqn(good_name3))
         
     
 suite = unittest.TestLoader().loadTestsFromTestCase(TestIscsi)

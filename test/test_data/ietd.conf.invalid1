@@ -1,0 +1,24 @@
+iSNSServer 192.168.1.16
+iSNSAccessControl No
+
+IncomingUser joe secret
+OutgoingUser jack 12charsecret
+
+# Targets definitions start with "Target" and the target name.
+# The target name must be a globally unique name, the iSCSI
+# standard defines the "iSCSI Qualified Name" as follows:
+#
+# iqn.yyyy-mm.<reversed domain name>[:identifier]
+#
+# "yyyy-mm" is the date at which the domain is valid and the identifier
+# is freely selectable. For further details please check the iSCSI spec.
+
+Target all your base are belong to us
+    # CHAP Users
+    #
+    # The same rules as for discovery users apply here.
+    #
+    # Don't set them if you don't want to use CHAP authentication.
+    #
+    #IncomingUser joe secret
+    #OutgoingUser jim 12charpasswd

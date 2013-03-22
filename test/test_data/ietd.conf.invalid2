@@ -1,0 +1,9 @@
+
+iSNSServer 192.168.1.16
+iSNSAccessControl No
+
+Target iqn.2001-04.com.example:storage.disk2.sys1.xyz
+    MaxConnections      1       # Number of connections/session
+    
+Target iqn.2001-04.com.example:storage.disk2.sys1.xyz
+    MaxConnections      2       # Number of connections/session
