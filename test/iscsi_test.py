@@ -18,12 +18,12 @@
 
 import os
 import unittest
-from duriel.iscsi import Iscsi
+from duriel.iscsi import Iscsi, IscsiError
 
 test_data_path = '{0}/test/test_data'.format(os.getcwd())
 
 class TestIscsi(unittest.TestCase):
-    
+  
     def setUp(self):
         self.ietd_version = '1.4.20.3'
         self.ietadm_version = '1.4.20.3'
@@ -63,23 +63,41 @@ class TestIscsi(unittest.TestCase):
         
     def test_parse_ietd_config(self):
         # parse_ietd_config()
-        
-        returned_obj = Iscsi().parse_ietd_config(self.ietd_config_path)
-        # return a dict 
-        self.assertEqual(dict, type(returned_obj))
+        self.maxDiff = None
         
         # Should raise IOError no such file if path incorrect
         self.assertRaises(IOError, Iscsi().parse_ietd_config, self.false_path)
         
-        # global and target keys must be type dict
-        self.assertEqual(dict, type(returned_obj['global']))
-        self.assertEqual(dict, type(returned_obj['target']))
-        
         # parse test_data/ietd.conf.validx files correctly
         valid1 = {
-            'global': {'IncomingUser': 'joe secret'},
-            'target': {'iqn.2001-04.com.example': {}},
+            'global': {
+                'IncomingUser': ['joe', 'secret']
+            },
+            'target': {
+                'iqn.2001-04.com.example': {},
+                'iqn.2001-04.com.example:storage.disk2.sys1.xyz': {
+                    'IncomingUser': ['joe', 'secret'],
+                    'OutgoingUser': ['jim', '12charpasswd']
+                }
             }
+        }
+            
+        valid2 = {
+            'global':{
+                'iSNSServer': '192.168.1.16',
+                'iSNSAccessControl': 'No',
+                'IncomingUser': ['joe', 'secret'],
+                'OutgoingUser': ['jack', '12charsecret']
+            },
+            'target':{
+                'iqn.2001-04.com.example:storage.disk2.sys1.xyz': {
+                    'Lun': ['0', 'Path=/dev/sdc,Type=fileio,ScsiId=xyz,ScsiSN=xyz'],
+                    'MaxConnections': '1',
+                    'MaxSessions': '0'
+                    }
+            }
+        }
+        
             
         valid1_file = '{0}/ietd.conf.valid1'.format(test_data_path)
         valid2_file = '{0}/ietd.conf.valid2'.format(test_data_path)
@@ -91,8 +109,8 @@ class TestIscsi(unittest.TestCase):
         self.assertEqual(valid1, Iscsi().parse_ietd_config(valid1_file))
         
         # raise IscsiError for invalid config file syntax
-        #self.assertRaises(IscsiError, Iscsi().parse_ietd_config, invalid1_file)
-        #self.assertRaises(IscsiError, Iscsi().parse_ietd_config, invalid2_file)
+        self.assertRaises(IscsiError, Iscsi().parse_ietd_config, invalid1_file)
+        self.assertRaises(IscsiError, Iscsi().parse_ietd_config, invalid2_file)
         #self.assertRaises(IscsiError, Iscsi().parse_ietd_config, invalid3_file)
         
     def test_test_valid_iqn(self):

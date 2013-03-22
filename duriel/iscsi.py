@@ -63,7 +63,7 @@ class Iscsi():
         ietd_conf = {}
         ietd_conf['global'] = {}
         ietd_conf['target'] = {}
-        inTarget = 0
+        inTarget = False
         with open(ietd_config_path) as f:
             for line in f:
                 li = line.strip()
@@ -72,17 +72,39 @@ class Iscsi():
                 
                 if li.split(' ')[0] == 'Target':
                     if not self.test_valid_iqn(li.split()[1]):
-                        raise IscsiError('Invalid Target iqn in config')
-                    inTarget = inTarget+1
-                    
+                        raise IscsiError('Syntax Error in Config. Invalid Target iqn.')
                     #test that iqn doesnt already exist as a key
+                    if li.split()[1] in ietd_conf['target']:
+                        raise IscsiError('Syntax Error in Config. Iqn must be unique')
+                        
+                    #create target
+                    ietd_conf['target'][li.split()[1]] = {}
                     
+                    #Set inTarget to the iqn
+                    inTarget = li.split()[1]
                     continue
-                
                     
-        print inTarget
-            
-            
+                if not inTarget:
+                    # Must be a line in 'global config'
+                    
+                    #test that directive doesn't already exists as key in global config'
+                    if li.split()[0] in ietd_conf['global']:
+                        raise IscsiError('Syntax Error in Config. global directives must be unique.')
+                    
+                    #add directive and value to global 
+                    ietd_conf['global'][li.split()[0]] = li.split()[1:]
+                    continue
+                    
+                else:
+                    #Must be inside a target block
+                    
+                    #test directive not already key in target
+                    if li.split()[0] in ietd_conf['target'][inTarget]:
+                        raise IscsiError('Syntax Error in Config. target directives must be unique.')
+                        
+                    #add directive and valie to target
+                    ietd_conf['target'][inTarget][li.split()[0]] = li.split()[1:]
+                    continue
         return ietd_conf
         
     def test_valid_iqn(self, iqn):
@@ -94,6 +116,7 @@ class Iscsi():
         
 class IscsiError(Exception):
     def __init__(self, msg):
+        self.msg = msg
         print self.msg
     
     
