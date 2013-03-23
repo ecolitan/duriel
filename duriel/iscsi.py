@@ -24,6 +24,13 @@ class Iscsi():
     def __init__(self):
         pass
         
+    def test_valid_iqn(self, iqn):
+        valid_iqn = re.compile('''iqn\.\d{4}-\d{2}(\.\w{1,64}){1,16}(:(\.?\w{1,64}){1,16})?''')
+        if re.match(valid_iqn, iqn):
+            return True
+        else:
+            return False        
+            
     def get_ietd_version(self, ietd_bin_path='/usr/sbin/ietd'):
         '''
         Return ietd version number.
@@ -153,12 +160,33 @@ class Iscsi():
                     
         return allowed_targets
         
-    def test_valid_iqn(self, iqn):
-        valid_iqn = re.compile('''iqn\.\d{4}-\d{2}(\.\w{1,64}){1,16}(:(\.?\w{1,64}){1,16})?''')
-        if re.match(valid_iqn, iqn):
-            return True
-        else:
-            return False
+    def parse_initiator_allow(self, initiator_config_path='/etc/iet/initiators.allow'):
+        #TODO initiator_config_path should be in config
+        
+        allowed_initiators = {}
+        
+        with open(initiator_config_path) as f:
+            for line in f:
+                li = line.strip()
+                if (li.lstrip().startswith('#') or not li):
+                    continue
+                    
+                directive = li.split()[0]
+                assignment = li.split()[1:]
+                
+                #remove commas from assignment words
+                for position, word in enumerate(assignment):
+                    if word[-1] == ',':
+                        assignment[position] = word[0:-1]
+                    
+                #save directive and assignment to allowed_initiators
+                allowed_initiators[directive] = assignment
+                
+                #Stop parsing file if initiator "ALL" encountered
+                if directive == 'ALL':
+                    break
+                    
+        return allowed_initiators
         
 class IscsiError(Exception):
     def __init__(self, msg=''):

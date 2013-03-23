@@ -134,7 +134,6 @@ class TestIscsi(unittest.TestCase):
         self.assertRaises(IOError, Iscsi().parse_target_allow, self.false_path)
         
         valid1_file = '{0}/targets.allow.valid1'.format(test_data_path)
-        
         valid1 = {
             'iqn.2001-04.com.example:storage.disk1.sys1.xyz': ['192.168.0.0/16'],
             'iqn.2001-04.com.example:storage.disk1.sys2.xyz': ['[3ffe:302:11:1:211:43ff:fe31:5ae2]', '192.168.22.24'],
@@ -144,6 +143,23 @@ class TestIscsi(unittest.TestCase):
         }
         
         self.assertEqual(valid1, Iscsi().parse_target_allow(valid1_file))
+    
+    def test_parse_initiator_allow(self):
+        #parse_initiator_allow()
+        
+        #raise IOError if no suhc file
+        self.assertRaises(IOError, Iscsi().parse_initiator_allow, self.false_path)
+
+        valid1_file =  '{0}/initiators.allow.valid1'.format(test_data_path)
+        valid1 = {
+            'iqn.2001-04.com.example:storage.disk1.sys1.xyz': ['192.168.0.0/16', '.*:mscs1-[1-4]\.example\.com'],
+            'iqn.2001-04.com.example:storage.disk1.sys2.xyz': ['[3ffe:302:11:1:211:43ff:fe31:5ae2]', '[3ffe:505:2:1::]/64', '192.168.22.0/24'],
+            'iqn.2001-04.com.example:storage.disk1.sys3.xyz': ['ALL'],
+            'iqn.2001-04.com.example:storage.disk1.sys4.xyz': ['192.168.22.3', 'iqn\.1998-01\.com\.vmware:.*\.example\.com'],
+            'ALL': ['192.168.0.0/16']
+        }
+        self.assertEqual(valid1, Iscsi().parse_initiator_allow(valid1_file))
+
     
 suite = unittest.TestLoader().loadTestsFromTestCase(TestIscsi)
 unittest.TextTestRunner(verbosity=2).run(suite)
