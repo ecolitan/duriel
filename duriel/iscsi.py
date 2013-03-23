@@ -90,9 +90,17 @@ class Iscsi():
                     #test that directive doesn't already exists as key in global config'
                     if li.split()[0] in ietd_conf['global']:
                         raise IscsiError('Syntax Error in Config. global directives must be unique.')
+                        
+                    #decide which parts of multi-arg assignment are valid and which are in-line comments
+                    directive = li.split()[0]
+                    assignment = li.split()[1:]
                     
-                    #add directive and value to global 
-                    ietd_conf['global'][li.split()[0]] = li.split()[1:]
+                    for position, word in enumerate(assignment):
+                        if word[0] == '#':
+                            assignment = assignment[0:position]
+                        
+                    #add directive and values to global 
+                    ietd_conf['global'][directive] = assignment
                     continue
                     
                 else:
@@ -102,9 +110,18 @@ class Iscsi():
                     if li.split()[0] in ietd_conf['target'][inTarget]:
                         raise IscsiError('Syntax Error in Config. target directives must be unique.')
                         
+                    #decide which parts of multi-arg assignment are valid and which are in-line comments
+                    directive = li.split()[0]
+                    assignment = li.split()[1:]
+                    
+                    for position, word in enumerate(assignment):
+                        if word[0] == '#':
+                            assignment = assignment[0:position]
+                        
                     #add directive and valie to target
-                    ietd_conf['target'][inTarget][li.split()[0]] = li.split()[1:]
+                    ietd_conf['target'][inTarget][directive] = assignment
                     continue
+        
         return ietd_conf
         
     def test_valid_iqn(self, iqn):
@@ -115,7 +132,7 @@ class Iscsi():
             return False
         
 class IscsiError(Exception):
-    def __init__(self, msg):
+    def __init__(self, msg=''):
         self.msg = msg
         print self.msg
     
