@@ -52,18 +52,35 @@ class TestIscsi(unittest.TestCase):
     def test_parse_sys_iscsi_config(self):
         # parse_sys_iscsi_config()
         
-        #return a dict
-        self.assertEqual(dict, type(Iscsi().parse_sys_iscsi_config(self.etc_default_iscsitarget_path)))
-        
         # Should raise IOError no such file if path incorrect
         self.assertRaises(IOError, Iscsi().parse_sys_iscsi_config, self.false_path)
         
-        #dict must contain keys ISCSITARGET_ENABLE
-        self.assertTrue('ISCSITARGET_ENABLE' in Iscsi().parse_sys_iscsi_config(self.etc_default_iscsitarget_path))
+        valid1 = {
+            'ISCSITARGET_ENABLE': 'false',
+            'ISCSITARGET_OPTIONS': '""'
+        }
         
+        valid1_file = '{0}/default.iscsitarget.valid1'.format(test_data_path)
+        
+        self.assertEqual(valid1, Iscsi().parse_sys_iscsi_config(valid1_file))
+        
+    def test_test_valid_iqn(self):
+        # parse_ietd_config.test_valid_iqn()
+        # target keys must be checked to be an "iSCSI Qualified Name"
+        
+        fake_name = 'iqn.com.example:storage.disk2.sys1.xyz'
+        good_name1 = 'iqn.2001-04.com.example:storage.disk2.sys1.xyz'
+        good_name2 = 'iqn.2001-04.com.example'
+        good_name3 = 'iqn.9846-34.com.example.test.sertver5'
+        
+        self.assertTrue(not Iscsi().test_valid_iqn(fake_name))
+        self.assertTrue(Iscsi().test_valid_iqn(good_name1))
+        self.assertTrue(Iscsi().test_valid_iqn(good_name2))
+        self.assertTrue(Iscsi().test_valid_iqn(good_name3))
+                
     def test_parse_ietd_config(self):
         # parse_ietd_config()
-        self.maxDiff = None
+        #self.maxDiff = None
         
         # Should raise IOError no such file if path incorrect
         self.assertRaises(IOError, Iscsi().parse_ietd_config, self.false_path)
@@ -97,37 +114,36 @@ class TestIscsi(unittest.TestCase):
                     }
             }
         }
-        
             
         valid1_file = '{0}/ietd.conf.valid1'.format(test_data_path)
         valid2_file = '{0}/ietd.conf.valid2'.format(test_data_path)
-        valid3_file = '{0}/ietd.conf.valid3'.format(test_data_path)
         invalid1_file = '{0}/ietd.conf.invalid1'.format(test_data_path)
         invalid2_file = '{0}/ietd.conf.invalid2'.format(test_data_path)
-        invalid3_file = '{0}/ietd.conf.invalid3'.format(test_data_path)
-                                        
-        #self.assertEqual(valid1, Iscsi().parse_ietd_config(valid1_file))
+                                                
+        self.assertEqual(valid1, Iscsi().parse_ietd_config(valid1_file))
         self.assertEqual(valid2, Iscsi().parse_ietd_config(valid2_file))
         
         # raise IscsiError for invalid config file syntax
         self.assertRaises(IscsiError, Iscsi().parse_ietd_config, invalid1_file)
         self.assertRaises(IscsiError, Iscsi().parse_ietd_config, invalid2_file)
-        #self.assertRaises(IscsiError, Iscsi().parse_ietd_config, invalid3_file)
         
-    def test_test_valid_iqn(self):
-        # parse_ietd_config.test_valid_iqn()
-        # target keys must be checked to be an "iSCSI Qualified Name"
+    def test_parse_target_allow(self):
+        #parse_target_allow()
         
-        fake_name = 'iqn.com.example:storage.disk2.sys1.xyz'
-        good_name1 = 'iqn.2001-04.com.example:storage.disk2.sys1.xyz'
-        good_name2 = 'iqn.2001-04.com.example'
-        good_name3 = 'iqn.9846-34.com.example.test.sertver5'
+        # Should raise IOError no such file if path incorrect
+        self.assertRaises(IOError, Iscsi().parse_target_allow, self.false_path)
         
-        self.assertTrue(not Iscsi().test_valid_iqn(fake_name))
-        self.assertTrue(Iscsi().test_valid_iqn(good_name1))
-        self.assertTrue(Iscsi().test_valid_iqn(good_name2))
-        self.assertTrue(Iscsi().test_valid_iqn(good_name3))
+        valid1_file = '{0}/targets.allow.valid1'.format(test_data_path)
         
+        valid1 = {
+            'iqn.2001-04.com.example:storage.disk1.sys1.xyz': ['192.168.0.0/16'],
+            'iqn.2001-04.com.example:storage.disk1.sys2.xyz': ['[3ffe:302:11:1:211:43ff:fe31:5ae2]', '192.168.22.24'],
+            'iqn.2001-04.com.example:storage.disk1.sys3.xyz': ['ALL'],
+            'iqn.2001-04.com.example:storage.disk1.sys4.xyz': ['192.168.22.3'],
+            'ALL': ['192.168.0.0/16']
+        }
+        
+        self.assertEqual(valid1, Iscsi().parse_target_allow(valid1_file))
     
 suite = unittest.TestLoader().loadTestsFromTestCase(TestIscsi)
 unittest.TextTestRunner(verbosity=2).run(suite)

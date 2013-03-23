@@ -50,7 +50,7 @@ class Iscsi():
                 li = line.strip()
                 if (not li.startswith('#') and li):
                     sys_iscsi_config[li.split('=')[0]] = li.split('=')[-1]
-            
+
         return sys_iscsi_config
         
     def parse_ietd_config(self, ietd_config_path='/etc/iet/ietd.conf'):
@@ -64,6 +64,7 @@ class Iscsi():
         ietd_conf['global'] = {}
         ietd_conf['target'] = {}
         inTarget = False
+        
         with open(ietd_config_path) as f:
             for line in f:
                 li = line.strip()
@@ -118,11 +119,39 @@ class Iscsi():
                         if word[0] == '#':
                             assignment = assignment[0:position]
                         
-                    #add directive and valie to target
+                    #add directive and value to target
                     ietd_conf['target'][inTarget][directive] = assignment
                     continue
         
         return ietd_conf
+        
+    def parse_target_allow(self, target_config_path='/etc/iet/targets.allow'):
+        #TODO target_config_path should be in config
+        
+        allowed_targets = {}
+        
+        with open(target_config_path) as f:
+            for line in f:
+                li = line.strip()
+                if (li.lstrip().startswith('#') or not li):
+                    continue
+                    
+                directive = li.split()[0]
+                assignment = li.split()[1:]
+                
+                #remove commas from assignment words
+                for position, word in enumerate(assignment):
+                    if word[-1] == ',':
+                        assignment[position] = word[0:-1]
+                    
+                #save directive and assignment to allowed_targets
+                allowed_targets[directive] = assignment
+                
+                #Stop parsing file if target "ALL" encountered
+                if directive == 'ALL':
+                    break
+                    
+        return allowed_targets
         
     def test_valid_iqn(self, iqn):
         valid_iqn = re.compile('''iqn\.\d{4}-\d{2}(\.\w{1,64}){1,16}(:(\.?\w{1,64}){1,16})?''')
